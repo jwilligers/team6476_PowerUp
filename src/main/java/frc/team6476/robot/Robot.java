@@ -1,23 +1,21 @@
 package frc.team6476.robot;
 
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import com.ctre.phoenix.motorcontrol.can.*;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Robot extends IterativeRobot {
     // Here we declare what our robot has.
-    // Motors (are connected to Talon SRX motor controller)
-    WPI_TalonSRX leftA, leftB, rightA, rightB, liftA, liftB, intakeLeft, intakeRight, gripperRotate;
+
+    // Subsystems
+    Drivetrain drivetrain;
+    Lift lift;
+    Intake intake;
+    Gripper gripper;
 
     // Joystick
     Joystick joystick;
 
-    // Drivetrain Encoders
-    Encoder leftEncoder, rightEncoder;
-
-    DifferentialDrive differentialDrive;
     double leftSpeed = 0;
     double rightSpeed = 0;
 
@@ -25,34 +23,28 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
         // Here we initialise everything our robot has and give port numbers and set values
 
-        // Drivetrain motors
-        leftA = new WPI_TalonSRX(Constants.leftA_CanID);
-        leftB = new WPI_TalonSRX(Constants.leftB_CanID);
-        rightA = new WPI_TalonSRX(Constants.rightA_CanID);
-        rightB = new WPI_TalonSRX(Constants.rightB_CanID);
+        // Drivetrain
+        drivetrain = new Drivetrain();
+        drivetrain.init();
 
-        // Lift motors
-        liftA = new WPI_TalonSRX(Constants.liftA_CanID);
-        liftB = new WPI_TalonSRX(Constants.liftB_CanID);
+        // Lift
+        lift = new Lift();
+        lift.init();
 
-        // Intake Motors
-        intakeLeft = new WPI_TalonSRX(Constants.intakeLeft_CanID);
-        intakeRight = new WPI_TalonSRX(Constants.intakeRight_CanID);
-        gripperRotate = new WPI_TalonSRX(Constants.gripperRotate_CanID);
+        //Intake
+        intake = new Intake();
+        intake.init();
 
-        // Set drivetrain motors to follow each other as are connected together in a Toughbox gearbox
-        leftB.follow(leftA);
-        rightB.follow(rightA);
-
-        intakeRight.follow(intakeLeft);
+        // Gripper
+        gripper = new Gripper();
+        gripper.init();
 
         joystick = new Joystick(0);
 
-        // Using 2 channel encoders with channel A and B
-        leftEncoder = new Encoder(Constants.leftEncoderPortA, Constants.leftEncoderPortB);
-        rightEncoder = new Encoder(Constants.rightEncoderPortA, Constants.rightEncoderPortB);
+        // Add a camera
+        CameraServer.getInstance().startAutomaticCapture();
 
-        differentialDrive = new DifferentialDrive(leftA, rightA);
+        publishStats();
     }
 
     @Override
@@ -61,8 +53,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void autonomousInit() {
         // Reset encoders
-        leftEncoder.reset();
-        rightEncoder.reset();
+        drivetrain.resetEncoders();
     }
 
     @Override
@@ -71,8 +62,6 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void testInit() {
-        leftEncoder.reset();
-        rightEncoder.reset();
     }
 
 
@@ -81,70 +70,79 @@ public class Robot extends IterativeRobot {
     
     @Override
     public void autonomousPeriodic() {
-        if (0.5*(leftEncoder.get()+rightEncoder.get()) < Constants.autoDistance) {
-            differentialDrive.arcadeDrive(Constants.autoSpeed, 0);
-        }
-        else
-        {
-            differentialDrive.arcadeDrive(0,0);
-        }
+        drivetrain.driveToDistance(Constants.autoDistance, Constants.autoSpeed);
+
+        publishStats();
     }
 
     @Override
     public void teleopPeriodic() {
 
         // Drivetrain
-        leftSpeed = joystick.getX() - joystick.getY();
-        rightSpeed = joystick.getX() + joystick.getY();
-
-        // Squared inputs give better range of motion.
-        differentialDrive.tankDrive(leftSpeed, rightSpeed, true);
+        leftSpeed = joystick.getY() + joystick.getX();
+        rightSpeed = joystick.getY() - joystick.getX();
+        drivetrain.drive(leftSpeed, rightSpeed);
 
         // Lift subsystem
         if (joystick.getRawButton(Constants.buttonLiftUp))
         {
-            liftA.set(Constants.liftUpSpeed);
+            lift.raise(Constants.liftUpSpeed);
         }
         else if (joystick.getRawButton(Constants.buttonLiftDown))
         {
-            liftA.set(-Constants.liftDownSpeed);
+            lift.lower(Constants.liftDownSpeed);
+        }
+        else if (joystick.getRawButton(Constants.buttonLiftSwitch))
+        {
+            // Right now you would have to hold this button down until it reaches the switch
+            lift.raiseToSwitch();
         }
         else
         {
-            liftA.set(0);
+            lift.stop();
         }
 
         // Intake subsystem
         if (joystick.getRawButton(Constants.buttonIntake))
         {
-            intakeLeft.set(Constants.intakeSpeed);
+            intake.intake();
         }
         else if (joystick.getRawButton(Constants.buttonOuttake))
         {
-            intakeLeft.set(-Constants.outtakeSpeed);
+            intake.outtake();
         }
         else
         {
-            intakeLeft.set(0);
+            intake.stop();
         }
 
-        // Intake subsystem
+        // Gripper subsystem
         if (joystick.getRawButton(Constants.buttonGripperUp))
         {
-            gripperRotate.set(Constants.gripperRotateSpeed);
+            gripper.rotateUp();
         }
         else if (joystick.getRawButton(Constants.buttonGripperDown))
         {
-            gripperRotate.set(-Constants.gripperRotateSpeed);
+            gripper.rotateDown();
         }
         else
         {
-            gripperRotate.set(0);
+            gripper.stop();
         }
 
+        publishStats();
     }
 
     @Override
     public void testPeriodic() {
+        publishStats();
+    }
+
+    public void publishStats()
+    {
+        drivetrain.publishStats();
+        gripper.publishStats();
+        intake.publishStats();
+        lift.publishStats();
     }
 }
