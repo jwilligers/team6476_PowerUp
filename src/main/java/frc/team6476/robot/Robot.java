@@ -3,6 +3,7 @@ package frc.team6476.robot;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
     // Here we declare what our robot has.
@@ -10,8 +11,8 @@ public class Robot extends IterativeRobot {
     // Subsystems
     Drivetrain drivetrain;
     Lift lift;
-    Intake intake;
-    Gripper gripper;
+    Claw claw;
+    ClawRotate clawRotate;
 
     // Joystick
     Joystick joystick;
@@ -19,7 +20,6 @@ public class Robot extends IterativeRobot {
     double leftSpeed = 0;
     double rightSpeed = 0;
 
-    @Override
     public void robotInit() {
         // Here we initialise everything our robot has and give port numbers and set values
 
@@ -31,13 +31,13 @@ public class Robot extends IterativeRobot {
         lift = new Lift();
         lift.init();
 
-        //Intake
-        intake = new Intake();
-        intake.init();
+        //Claw
+        claw = new Claw();
+        claw.init();
 
-        // Gripper
-        gripper = new Gripper();
-        gripper.init();
+        // ClawRotate
+        clawRotate = new ClawRotate();
+        clawRotate.init();
 
         joystick = new Joystick(0);
 
@@ -47,40 +47,38 @@ public class Robot extends IterativeRobot {
         publishStats();
     }
 
-    @Override
     public void disabledInit() { }
 
-    @Override
     public void autonomousInit() {
         // Reset encoders
         drivetrain.resetEncoders();
     }
 
-    @Override
     public void teleopInit() {
     }
 
-    @Override
     public void testInit() {
     }
 
 
-    @Override
     public void disabledPeriodic() { }
-    
-    @Override
+
     public void autonomousPeriodic() {
         drivetrain.driveToDistance(Constants.autoDistance, Constants.autoSpeed);
 
         publishStats();
     }
 
-    @Override
     public void teleopPeriodic() {
 
         // Drivetrain
         leftSpeed = joystick.getY() + joystick.getX();
         rightSpeed = joystick.getY() - joystick.getX();
+        SmartDashboard.putNumber("Left Speed", leftSpeed);
+        SmartDashboard.putNumber("Right Speed", rightSpeed);
+        SmartDashboard.putNumber("Joystick X", joystick.getX());
+        SmartDashboard.putNumber("Joystick Y", joystick.getY());
+
         drivetrain.drive(leftSpeed, rightSpeed);
 
         // Lift subsystem
@@ -102,38 +100,36 @@ public class Robot extends IterativeRobot {
             lift.stop();
         }
 
-        // Intake subsystem
-        if (joystick.getRawButton(Constants.buttonIntake))
+        // Claw subsystem
+        if (joystick.getRawButton(Constants.buttonGrab))
         {
-            intake.intake();
+            claw.grab();
         }
-        else if (joystick.getRawButton(Constants.buttonOuttake))
+        else if (joystick.getRawButton(Constants.buttonLetGo))
         {
-            intake.outtake();
+            claw.letGo();
         }
         else
         {
-            intake.stop();
+            claw.stop();
         }
 
-        // Gripper subsystem
+        // ClawRotate subsystem
         if (joystick.getRawButton(Constants.buttonGripperUp))
         {
-            gripper.rotateUp();
+            clawRotate.rotateUp();
         }
         else if (joystick.getRawButton(Constants.buttonGripperDown))
         {
-            gripper.rotateDown();
+            clawRotate.rotateDown();
         }
         else
         {
-            gripper.stop();
+            clawRotate.stop();
         }
 
         publishStats();
     }
-
-    @Override
     public void testPeriodic() {
         publishStats();
     }
@@ -141,8 +137,8 @@ public class Robot extends IterativeRobot {
     public void publishStats()
     {
         drivetrain.publishStats();
-        gripper.publishStats();
-        intake.publishStats();
+        clawRotate.publishStats();
+        claw.publishStats();
         lift.publishStats();
     }
 }

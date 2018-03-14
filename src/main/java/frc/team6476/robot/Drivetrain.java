@@ -2,7 +2,6 @@ package frc.team6476.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain {
@@ -11,7 +10,7 @@ public class Drivetrain {
     ADXRS450_Gyro gyro;
 
     // Drivetrain Encoders
-    Encoder leftEncoder, rightEncoder;
+    //Encoder leftEncoder, rightEncoder;
 
     public void init()
     {
@@ -25,12 +24,15 @@ public class Drivetrain {
         leftB.follow(leftA);
         rightB.follow(rightA);
 
+
+        gyro.reset();
+
         // Using 2 channel encoders with channel A and B
-        leftEncoder = new Encoder(Constants.leftEncoderPortA, Constants.leftEncoderPortB);
-        rightEncoder = new Encoder(Constants.rightEncoderPortA, Constants.rightEncoderPortB);
+        /*leftEncoder = new Encoder(Constants.leftEncoderPortA, Constants.leftEncoderPortB);
+        rightEncoder = new Encoder(Constants.rightEncoderPortA, Constants.rightEncoderPortB);*/
 
         //Right encoder will be flipped compared to left
-        rightEncoder.setReverseDirection(true);
+        //rightEncoder.setReverseDirection(true);
 
     }
 
@@ -61,28 +63,31 @@ public class Drivetrain {
     {
         // Assumes encoders have been reset before calling this
         // As we only use the encoders to drive straight, they should be the same
-        int distanceTravelled = (leftEncoder.get()+rightEncoder.get())/2;
+        //int distanceTravelled = (leftEncoder.get()+rightEncoder.get())/2;
 
-        if (distanceTravelled > pulses)
+        /*if (distanceTravelled > pulses)
         {
             drive(0,0);
         }
         else
         {
             drive(speed,speed);
-        }
+        }*/
     }
     public void resetEncoders()
     {
-        leftEncoder.reset();
-        rightEncoder.reset();
+        /*leftEncoder.reset();
+        rightEncoder.reset();*/
     }
     public void publishStats()
     {
-        SmartDashboard.putNumber("Left Motor Speed", leftA.get());
-        SmartDashboard.putNumber("Right Motor Speed", rightA.get());
-        SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
-        SmartDashboard.putNumber("Right Encoder", rightEncoder.get());
+        SmartDashboard.putNumber("Left A Motor Speed", leftA.get());
+        SmartDashboard.putNumber("Left B Motor Speed", leftB.get());
+        SmartDashboard.putNumber("Right A Motor Speed", rightA.get());
+        SmartDashboard.putNumber("Right B Motor Speed", rightB.get());
+        SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
+        /*SmartDashboard.putNumber("Left Encoder", leftEncoder.get());
+        SmartDashboard.putNumber("Right Encoder", rightEncoder.get());*/
     }
 
 }

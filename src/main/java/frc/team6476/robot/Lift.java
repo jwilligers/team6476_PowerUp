@@ -1,28 +1,25 @@
 package frc.team6476.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Lift {
 
-    WPI_TalonSRX liftA, liftB;
+    Spark lift;
     Encoder liftEncoder;
 
     public void init()
     {
         // Initialise drivetrain
-        liftA = new WPI_TalonSRX(Constants.liftA_CanID);
-        liftB = new WPI_TalonSRX(Constants.liftB_CanID);
-        // Set drivetrain motors to follow each other as are connected together in a Toughbox gearbox
-        liftB.follow(liftA);
+        lift = new Spark(Constants.lift_PWM);
 
         liftEncoder = new Encoder(Constants.liftEncoderPortA, Constants.liftEncoderPortB);
     }
 
     private void setSpeed(double speed)
     {
-        liftA.set(speed);
+        lift.set(speed);
     }
     public void raise(double speed)
     {
@@ -54,7 +51,7 @@ public class Lift {
     }
     public void publishStats()
     {
-        SmartDashboard.putNumber("Lift motor speed", liftA.get());
+        SmartDashboard.putNumber("Lift motor speed", lift.get());
         SmartDashboard.putNumber("Lift encoder", liftEncoder.get());
     }
 }
