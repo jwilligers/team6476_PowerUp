@@ -13,6 +13,7 @@ public class Claw {
         intake = new Spark(Constants.claw_PWM);
         intake.set(0);
         clawEncoder = new Encoder(Constants.clawEncoderPortA, Constants.clawEncoderPortB);
+        clawEncoder.reset();
     }
 
     private void setSpeed(double speed)
@@ -21,11 +22,11 @@ public class Claw {
     }
     public void grab()
     {
-        setSpeed(Constants.intakeSpeed);
+        setSpeed(Constants.clawSpeed);
     }
     public void letGo()
     {
-        setSpeed(Constants.outtakeSpeed);
+        setSpeed(-Constants.clawSpeed);
     }
     public void stop()
     {
@@ -34,9 +35,6 @@ public class Claw {
     public void publishStats()
     {
         SmartDashboard.putNumber("Claw Motor Speed", intake.get());
+        SmartDashboard.putNumber("Claw encoder", clawEncoder.get());
     }
 }
-
-
-
-

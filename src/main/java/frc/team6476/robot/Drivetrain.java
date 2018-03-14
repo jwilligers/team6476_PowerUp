@@ -24,7 +24,7 @@ public class Drivetrain {
         leftB.follow(leftA);
         rightB.follow(rightA);
 
-
+        gyro = new ADXRS450_Gyro();
         gyro.reset();
 
         // Using 2 channel encoders with channel A and B
@@ -51,7 +51,7 @@ public class Drivetrain {
         {
             right = 1;
         }
-        if (right < 1)
+        if (right < -1)
         {
             right = -1;
         }

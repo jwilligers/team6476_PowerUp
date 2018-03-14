@@ -14,7 +14,7 @@ public class Lift {
         // Initialise drivetrain
         lift = new Spark(Constants.lift_PWM);
 
-        liftEncoder = new Encoder(Constants.liftEncoderPortA, Constants.liftEncoderPortB);
+        liftEncoder = new Encoder(Constants.liftEncoderPortA, Constants.liftEncoderPortB, true);
     }
 
     private void setSpeed(double speed)
@@ -33,22 +33,28 @@ public class Lift {
     {
         setSpeed(Constants.liftStopSpeed);
     }
-    public void raiseToSwitch()
+    public void raiseToLevel(double height)
     {
         /* Very basic code to go to a set height Ideally the speed would change depending on how big the error is
            so if you were on the floor trying to go to the scale, it would go really fast and gradually slow down
            as you reach the target */
 
-        double error = Constants.liftSwitchHeight-liftEncoder.get();
-        if (error > 0)
+        double error = height-liftEncoder.get();
+        if (Math.abs(error) < 10)
         {
-            lower(Constants.liftUpSpeed);
+            stop();
         }
-        else
-        {
-            raise(Constants.liftDownSpeed);
+        else {
+            if (error > 0)
+            {
+                lower(Constants.liftUpSpeed);
+            } else
+            {
+                raise(Constants.liftDownSpeed);
+            }
         }
     }
+
     public void publishStats()
     {
         SmartDashboard.putNumber("Lift motor speed", lift.get());

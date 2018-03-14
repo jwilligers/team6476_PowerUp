@@ -15,16 +15,15 @@ public class ClawRotate {
         clawRotateEncoder = new Encoder(Constants.clawRotateEncoderPortA, Constants.clawRotateEncoderPortB);
         clawRotateEncoder.reset();
     }
-
     private void setSpeed(double speed)
     {
         clawRotate.set(speed);
     }
     public void rotateUp()
     {
-        if (clawRotateEncoder.get()>Constants.gripperUpPosition)
+        if (clawRotateEncoder.get()>Constants.clawUpPosition)
         {
-            setSpeed(-Constants.gripperRotateSpeed);
+            setSpeed(Constants.clawRotateSpeed);
         }
         else
         {
@@ -33,9 +32,9 @@ public class ClawRotate {
     }
     public void rotateDown()
     {
-        if (clawRotateEncoder.get()<Constants.gripperDownPosition)
+        if (clawRotateEncoder.get()<Constants.clawDownPosition)
         {
-            setSpeed(-Constants.gripperRotateSpeed);
+            setSpeed(-Constants.clawRotateSpeed);
         }
         else
         {
@@ -49,6 +48,7 @@ public class ClawRotate {
     public void publishStats()
     {
         SmartDashboard.putNumber("Claw Rotate Motor Speed", clawRotate.get());
+        SmartDashboard.putNumber("Claw Rotate Encoder", clawRotateEncoder.get());
     }
 }
 

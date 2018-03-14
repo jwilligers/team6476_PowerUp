@@ -60,12 +60,10 @@ public class Robot extends IterativeRobot {
     public void testInit() {
     }
 
-
     public void disabledPeriodic() { }
 
     public void autonomousPeriodic() {
         drivetrain.driveToDistance(Constants.autoDistance, Constants.autoSpeed);
-
         publishStats();
     }
 
@@ -93,7 +91,27 @@ public class Robot extends IterativeRobot {
         else if (joystick.getRawButton(Constants.buttonLiftSwitch))
         {
             // Right now you would have to hold this button down until it reaches the switch
-            lift.raiseToSwitch();
+            lift.raiseToLevel(Constants.liftSwitchHeight);
+        }
+        else if (joystick.getRawButton(Constants.buttonLiftLowScale))
+        {
+            // Right now you would have to hold this button down until it reaches the switch
+            lift.raiseToLevel(Constants.liftScaleLowHeight);
+        }
+        else if (joystick.getRawButton(Constants.buttonLiftMedScale))
+        {
+            // Right now you would have to hold this button down until it reaches the switch
+            lift.raiseToLevel(Constants.liftScaleMedHeight);
+        }
+        else if (joystick.getRawButton(Constants.buttonLiftHighScale))
+        {
+            // Right now you would have to hold this button down until it reaches the switch
+            lift.raiseToLevel(Constants.liftScaleHighHeight);
+        }
+        else if (joystick.getRawButton(Constants.buttonLiftMaxHeight))
+        {
+            // Right now you would have to hold this button down until it reaches the switch
+            lift.raiseToLevel(Constants.liftMaxHeight);
         }
         else
         {
@@ -115,11 +133,11 @@ public class Robot extends IterativeRobot {
         }
 
         // ClawRotate subsystem
-        if (joystick.getRawButton(Constants.buttonGripperUp))
+        if (joystick.getRawButton(Constants.buttonClawRotateUp))
         {
             clawRotate.rotateUp();
         }
-        else if (joystick.getRawButton(Constants.buttonGripperDown))
+        else if (joystick.getRawButton(Constants.buttonClawRotateDown))
         {
             clawRotate.rotateDown();
         }
