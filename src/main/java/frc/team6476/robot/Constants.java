@@ -15,6 +15,8 @@ public class Constants {
     public static final int buttonLiftHighScale = 10;
     public static final int buttonLiftMaxHeight = 11;
 
+    // Xbox Buttons
+
     // DIO Ports
     public static final int liftEncoderPortA = 0;
     public static final int liftEncoderPortB = 1;
@@ -22,6 +24,7 @@ public class Constants {
     public static final int clawEncoderPortB = 3;
     public static final int clawRotateEncoderPortA = 4;
     public static final int clawRotateEncoderPortB = 5;
+    public static final int liftLimitSwitchLower = 6;
 
     // PWM Ports
     public static final int lift_PWM = 0;
@@ -35,12 +38,12 @@ public class Constants {
     public static final int rightB_CanID = 4;
 
     // Game variables
-    public static final double autoSpeed = 0.6;
-    public static final int autoDistance = 100;
+    public static final double autoSpeed = 0.7;
+    public static final int autoDistance = 7000;
 
     // Lift Variables
-    public static final double liftUpSpeed = 0.6;
-    public static final double liftDownSpeed = 0.6;
+    public static final double liftUpSpeed = 0.85;
+    public static final double liftDownSpeed = 0.85;
     public static final double liftStopSpeed = 0;
     public static final double liftSwitchHeight = 1200;
     public static final double liftScaleLowHeight = 2350;
@@ -49,12 +52,14 @@ public class Constants {
     public static final double liftMaxHeight = 3600;
 
     // Claw Grabber variables
-    public static final double clawSpeed = 0.5;
+    public static final double clawSpeed = 0.75;
+    public static final double clawStopSpeed = -0.45;
     public static final double clawOutPosition = 100; // Invert
     public static final double clawInPosition = -20;
 
     // Claw Rotate Variables
-    public static final double clawRotateSpeed = 0.5;
+    public static final double clawRotateSpeed = 0.9;
+    public static final double clawRotateSlowSpeed = 0.5;
     public static final double clawUpPosition = 100;
     public static final double clawDownPosition = -100;
 }

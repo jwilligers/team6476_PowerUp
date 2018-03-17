@@ -1,8 +1,6 @@
 package frc.team6476.robot;
 
-import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
@@ -14,11 +12,14 @@ public class Robot extends IterativeRobot {
     Claw claw;
     ClawRotate clawRotate;
 
-    // Joystick
+    // Controllers
     Joystick joystick;
+    XboxController xboxController;
 
     double leftSpeed = 0;
     double rightSpeed = 0;
+    double speedMultiplier = 0;
+    boolean clawGrabCube = true;
 
     public void robotInit() {
         // Here we initialise everything our robot has and give port numbers and set values
@@ -40,21 +41,24 @@ public class Robot extends IterativeRobot {
         clawRotate.init();
 
         joystick = new Joystick(0);
+        xboxController = new XboxController(1);
 
         // Add a camera
         CameraServer.getInstance().startAutomaticCapture();
 
         publishStats();
-    }
+}
 
     public void disabledInit() { }
 
     public void autonomousInit() {
         // Reset encoders
         drivetrain.resetEncoders();
+        clawGrabCube = true;
     }
 
     public void teleopInit() {
+        clawGrabCube = true;
     }
 
     public void testInit() {
@@ -70,48 +74,31 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
 
         // Drivetrain
-        leftSpeed = joystick.getY() + joystick.getX();
-        rightSpeed = joystick.getY() - joystick.getX();
+        leftSpeed = joystick.getY() - joystick.getX();
+        rightSpeed = joystick.getY() + joystick.getX();
         SmartDashboard.putNumber("Left Speed", leftSpeed);
         SmartDashboard.putNumber("Right Speed", rightSpeed);
         SmartDashboard.putNumber("Joystick X", joystick.getX());
         SmartDashboard.putNumber("Joystick Y", joystick.getY());
-
-        drivetrain.drive(leftSpeed, rightSpeed);
-
+        speedMultiplier = 0.5*(1-joystick.getThrottle());
+        drivetrain.drive(leftSpeed*speedMultiplier, rightSpeed*speedMultiplier);
+        System.out.println(xboxController.getTriggerAxis(GenericHID.Hand.kLeft));
         // Lift subsystem
-        if (joystick.getRawButton(Constants.buttonLiftUp))
+        if (xboxController.getAButton())
         {
             lift.raise(Constants.liftUpSpeed);
         }
-        else if (joystick.getRawButton(Constants.buttonLiftDown))
+        else if (xboxController.getY(GenericHID.Hand.kRight)>0)
+        {
+            lift.lower(xboxController.getY(GenericHID.Hand.kRight));
+        }
+        else if (xboxController.getY(GenericHID.Hand.kRight)<0)
+        {
+            lift.raise(-xboxController.getY(GenericHID.Hand.kRight));
+        }
+        else if (xboxController.getBButton())
         {
             lift.lower(Constants.liftDownSpeed);
-        }
-        else if (joystick.getRawButton(Constants.buttonLiftSwitch))
-        {
-            // Right now you would have to hold this button down until it reaches the switch
-            lift.raiseToLevel(Constants.liftSwitchHeight);
-        }
-        else if (joystick.getRawButton(Constants.buttonLiftLowScale))
-        {
-            // Right now you would have to hold this button down until it reaches the switch
-            lift.raiseToLevel(Constants.liftScaleLowHeight);
-        }
-        else if (joystick.getRawButton(Constants.buttonLiftMedScale))
-        {
-            // Right now you would have to hold this button down until it reaches the switch
-            lift.raiseToLevel(Constants.liftScaleMedHeight);
-        }
-        else if (joystick.getRawButton(Constants.buttonLiftHighScale))
-        {
-            // Right now you would have to hold this button down until it reaches the switch
-            lift.raiseToLevel(Constants.liftScaleHighHeight);
-        }
-        else if (joystick.getRawButton(Constants.buttonLiftMaxHeight))
-        {
-            // Right now you would have to hold this button down until it reaches the switch
-            lift.raiseToLevel(Constants.liftMaxHeight);
         }
         else
         {
@@ -119,25 +106,45 @@ public class Robot extends IterativeRobot {
         }
 
         // Claw subsystem
-        if (joystick.getRawButton(Constants.buttonGrab))
-        {
-            claw.grab();
-        }
-        else if (joystick.getRawButton(Constants.buttonLetGo))
+        if (xboxController.getBumper(GenericHID.Hand.kLeft))
         {
             claw.letGo();
+            clawGrabCube = false;
+        }
+        else if (xboxController.getBumper(GenericHID.Hand.kRight))
+        {
+            claw.grab();
+            //clawGrabCube = true;
+        }
+        else if (xboxController.getTriggerAxis(GenericHID.Hand.kLeft) > 0.2)
+        {
+            claw.letGo();
+            clawGrabCube = false;
+        }
+        else if (xboxController.getTriggerAxis(GenericHID.Hand.kRight) > 0.2)
+        {
+            claw.grab();
+            //clawGrabCube = true;
         }
         else
         {
-            claw.stop();
+            if(clawGrabCube)
+            {
+                claw.grab();
+            }
+            else {
+                claw.letGo();
+            }
         }
+        SmartDashboard.putNumber("Xbox POV", xboxController.getPOV());
+        SmartDashboard.putBoolean("Grab cube", clawGrabCube);
 
         // ClawRotate subsystem
-        if (joystick.getRawButton(Constants.buttonClawRotateUp))
+        if (xboxController.getPOV() == 0)
         {
             clawRotate.rotateUp();
         }
-        else if (joystick.getRawButton(Constants.buttonClawRotateDown))
+        else if (xboxController.getPOV() == 180)
         {
             clawRotate.rotateDown();
         }
@@ -146,6 +153,11 @@ public class Robot extends IterativeRobot {
             clawRotate.stop();
         }
 
+        if (xboxController.getStartButton()) {
+            lift.raise(0.5);
+            clawRotate.rotateUp();
+            claw.grab();
+        }
         publishStats();
     }
     public void testPeriodic() {
@@ -158,5 +170,7 @@ public class Robot extends IterativeRobot {
         clawRotate.publishStats();
         claw.publishStats();
         lift.publishStats();
+        SmartDashboard.putNumber("Xbox Right Stick YAxis", xboxController.getY(GenericHID.Hand.kRight));
+        SmartDashboard.putNumber("Speed Multiplier", speedMultiplier);
     }
 }

@@ -1,25 +1,28 @@
 package frc.team6476.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Lift {
 
-    Spark lift;
+    Spark liftMotor;
     Encoder liftEncoder;
+    DigitalInput liftLimitSwitchDown;
 
     public void init()
     {
         // Initialise drivetrain
-        lift = new Spark(Constants.lift_PWM);
+        liftMotor = new Spark(Constants.lift_PWM);
+        liftLimitSwitchDown = new DigitalInput(Constants.liftLimitSwitchLower);
 
         liftEncoder = new Encoder(Constants.liftEncoderPortA, Constants.liftEncoderPortB, true);
     }
 
     private void setSpeed(double speed)
     {
-        lift.set(speed);
+        liftMotor.set(speed);
     }
     public void raise(double speed)
     {
@@ -27,7 +30,12 @@ public class Lift {
     }
     public void lower(double speed)
     {
-        setSpeed(speed);
+        if(liftLimitSwitchDown.get()) {
+            setSpeed(-speed);
+        }
+        else{
+            setSpeed(0);
+        }
     }
     public void stop()
     {
@@ -57,7 +65,8 @@ public class Lift {
 
     public void publishStats()
     {
-        SmartDashboard.putNumber("Lift motor speed", lift.get());
+        SmartDashboard.putNumber("Lift motor speed", liftMotor.get());
         SmartDashboard.putNumber("Lift encoder", liftEncoder.get());
+        SmartDashboard.putBoolean("Lift Lower Limit Switch", liftLimitSwitchDown.get());
     }
 }

@@ -21,25 +21,15 @@ public class ClawRotate {
     }
     public void rotateUp()
     {
-        if (clawRotateEncoder.get()>Constants.clawUpPosition)
-        {
-            setSpeed(Constants.clawRotateSpeed);
-        }
-        else
-        {
-            setSpeed(0);
-        }
+        setSpeed(Constants.clawRotateSpeed);
+    }
+    public void rotateUpSlowly()
+    {
+        setSpeed(Constants.clawRotateSlowSpeed);
     }
     public void rotateDown()
     {
-        if (clawRotateEncoder.get()<Constants.clawDownPosition)
-        {
-            setSpeed(-Constants.clawRotateSpeed);
-        }
-        else
-        {
-            setSpeed(0);
-        }
+        setSpeed(-Constants.clawRotateSpeed);
     }
     public void stop()
     {

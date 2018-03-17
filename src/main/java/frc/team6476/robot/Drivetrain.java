@@ -52,15 +52,15 @@ public class Drivetrain {
             right = -1;
         }
 
-        leftA.set(left);
-        rightA.set(-right);
+        leftA.set(-left);
+        rightA.set(right);
     }
 
     public void driveToDistance(int pulses, double speed)
     {
         // Assumes encoders have been reset before calling this
         // As we only use the encoders to drive straight, they should be the same
-        int distanceTravelled = (leftEncoder.getQuadraturePosition()-rightEncoder.getQuadraturePosition())/2;
+        int distanceTravelled = (-leftEncoder.getQuadraturePosition()+rightEncoder.getQuadraturePosition())/2;
 
         //Right encoder will be flipped compared to left
 
@@ -70,10 +70,15 @@ public class Drivetrain {
         }
         else
         {
-            drive(speed,speed);
+            drive(-speed,-speed);
         }
     }
 
+    public void resetEncoders()
+    {
+        leftEncoder.setQuadraturePosition(0, 100);
+        rightEncoder.setQuadraturePosition(0, 100);
+    }
     public void publishStats()
     {
         SmartDashboard.putNumber("Left A Motor Speed", leftA.get());
