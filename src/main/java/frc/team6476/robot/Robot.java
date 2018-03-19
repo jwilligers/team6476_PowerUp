@@ -2,6 +2,7 @@ package frc.team6476.robot;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class Robot extends IterativeRobot {
     // Here we declare what our robot has.
@@ -20,6 +21,7 @@ public class Robot extends IterativeRobot {
     double rightSpeed = 0;
     double speedMultiplier = 0;
     boolean clawGrabCube = true;
+    String gameData;
 
     public void robotInit() {
         // Here we initialise everything our robot has and give port numbers and set values
@@ -55,6 +57,7 @@ public class Robot extends IterativeRobot {
         // Reset encoders
         drivetrain.resetEncoders();
         clawGrabCube = true;
+        gameData = DriverStation.getInstance().getGameSpecificMessage();
     }
 
     public void teleopInit() {

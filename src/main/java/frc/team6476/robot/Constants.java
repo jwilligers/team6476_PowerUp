@@ -58,7 +58,7 @@ public class Constants {
     public static final double clawInPosition = -20;
 
     // Claw Rotate Variables
-    public static final double clawRotateSpeed = 0.9;
+    public static final double clawRotateSpeed = 1.0;
     public static final double clawRotateSlowSpeed = 0.5;
     public static final double clawUpPosition = 100;
     public static final double clawDownPosition = -100;
